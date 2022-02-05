@@ -59,6 +59,8 @@ BookStore:
 	searchEmployee : function
 	searchCustomer : function
 	searchBook : function
+	logAsEmployee : function
+	logAsCostumer : function
 	
 DatabaseHelperClass:
 	filename : str
