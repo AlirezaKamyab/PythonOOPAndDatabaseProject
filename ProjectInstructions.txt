@@ -1,0 +1,91 @@
+Book Store
+
+Person:
+	name : str
+	lastname : str
+	ID : int
+	
+User:
+	username : str
+	password : str
+	creationDate : str # When user is created in format yyyy/mm/dd
+
+Customer(Person, User)
+	credit : int
+	Books : list
+	completedBooks : list
+	
+	buyABook : function
+	setABookAsCompleted : function
+	increaseCredit : function
+	
+Book:
+	ID : int
+	title : str
+	author : str
+	genre : str
+	pages : int
+	price : int
+	count : int # number of the book available at book store
+	
+Employee(Person, User):
+	personnelID : int
+	baseIncome : int
+	reward : int # Reward 100,000 for every 1 hour extra time
+	penalty : int # Penalty is given when employee's leave time exceed 15
+	employeetype : _ (could be string, could be int, . . .)
+	
+	leave : function
+	extraTime : function
+	income : function # returns baseIncome + reward + penalty
+	CustomerInfo : function
+
+Manager(Employee):
+	hireEmployee : function
+	fireEmployee : function
+	employeeInfo : function
+	addABook : function
+	removeABook : function
+	
+BookStore:
+	books : list
+	customers : list
+	employees : list
+	manager : Manager
+	
+	# should be iterable and iterate through books
+	addABook : function
+	removeABook : function
+	searchEmployee : function
+	searchCustomer : function
+	searchBook : function
+	
+DatabaseHelperClass:
+	filename : str
+	tablename : str
+
+	connect : function
+	createTable : function
+	insert : function
+	update : function
+	remove : funtion
+	select : function
+	count : function
+	
+
+
+// Database commands
+DROP TABLE IF EXISTS <table name>
+INSERT INTO <table name> (parameters) VALUES (values)
+SELECT COUNT(*) FROM <table name>
+SELECT column1, column2 FROM <table name>
+SELECT * FROM <table name>
+DELETE FROM <table name> WHERE (condition)
+
+UPDATE table_name
+SET column1 = value1, column2 = value2...., columnN = valueN
+WHERE [condition];
+
+	
+	
+	
