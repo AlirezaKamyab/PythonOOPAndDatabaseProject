@@ -33,7 +33,10 @@ Employee(Person, User):
 	baseIncome : int
 	reward : int # Reward 100,000 for every 1 hour extra time
 	penalty : int # Penalty is given when employee's leave time exceed 15
-	employeetype : _ (could be string, could be int, . . .)
+	offHours: int # number of hours the employee took off
+	extraTime: int # number of hours employee worked extra
+	store: BookStore # the book store that employee is working it
+	employeetype : _ (could be string, could be int, . . .) # can we use type() method instead of defining it?
 	
 	leave : function
 	extraTime : function
