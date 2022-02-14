@@ -79,6 +79,13 @@ class Customer(person.Person, user.User):
                 flag = True
                 break
         if not flag: raise CustomerException(f"Book doesn't exist or you don't own the book!")
+
+        flag = True
+        for i in self.completed:
+            if i.id == bk.id:
+                flag = False
+                break
+        if not flag: raise CustomerException(f"Specified book is already in the completed list!")
         self.completed.append(bk)
 
         # Update database
