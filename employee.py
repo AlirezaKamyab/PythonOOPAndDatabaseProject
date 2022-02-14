@@ -115,12 +115,21 @@ class Employee(person.Person, user.User):
     def income(self):
         return self.baseIncome + self.reward - self.penalty
 
-    def CustomerInfo(self, customerId):
+    def customerInfo(self, customerId):
+        """
+        Searches through Store to find the Customer with specified ID
+        :param customerId: Customer with customerId will be searched
+        :return: If found, return a string with customer info otherwise "Customer with id {customerId} not found"
+        """
         cus = self.store.searchCustomer(customerId)
-        if cus is None: return f'Customer with id {customerId}'
+        if cus is None: return f'Customer with id {customerId} not found'
 
         return f'#{cus.id} {cus.name} {cus.lastname}\nUsername: {cus.username} Password: {cus.password}\n' \
                f'Credit: {cus.credit}'
+
+    def __str__(self):
+        return f"#{self.id} {self.name} {self.lastname}\nUsername: {self.username} Password: {self.password}\n" \
+               f"Income {self.income()}"
 
     def update_employee_from_database(self):
         helper = DatabaseHelper(self.store.databasePath, self.store.EMPLOYEES_TABLE)
