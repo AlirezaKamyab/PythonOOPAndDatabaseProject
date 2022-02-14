@@ -78,6 +78,9 @@ class Book:
         if value < 0: raise BookException("Number of books cannot be a negative value")
         self._count = value
 
+    def __str__(self):
+        return f"#{self.id} {self.title} by {self.author}, Price: {self.price}, Count: {self.count}"
+
 
 def main():
     Book()
