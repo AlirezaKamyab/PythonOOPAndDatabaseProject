@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+import manager
 from databaseHelper import DatabaseHelper
 import book
 import customer
@@ -24,7 +25,7 @@ class BookStore:
         databasePath: locates the database to load data from (optional)
         """
 
-        if 'manager' in kwargs: self.manager = kwargs['manager']
+        if 'manager' in kwargs: self.manager_store = kwargs['manager']
         else: raise BookStoreException('Manager is missing')
 
         if 'databasePath' in kwargs: self.databasePath = kwargs['databasePath']
@@ -45,9 +46,16 @@ class BookStore:
     def employees(self): return self._employees
     @property
     def databasePath(self): return self._databasePath
+    @property
+    def manager_store(self): return self._manager_store
 
     @databasePath.setter
     def databasePath(self, value): self._databasePath = value
+
+    @manager_store.setter
+    def manager_store(self, value):
+        value.id = 1
+        self._manager_store = value
 
     def __initialize(self):
         """
@@ -61,7 +69,7 @@ class BookStore:
         books.createTable(
             f"""
             CREATE TABLE {self.BOOKS_TABLE} 
-            (id INT PRIMARY KEY AUTOINCREMENT,
+            (id INTEGER PRIMARY KEY AUTOINCREMENT,
             title TEXT,
             author TEXT,
             genre TEXT,
@@ -75,7 +83,7 @@ class BookStore:
         customers.createTable(
             f"""
             CREATE TABLE {self.CUSTOMERS_TABLE}
-            (id INT PRIMARY KEY,
+            (id INTEGER PRIMARY KEY,
             name TEXT,
             lastname TEXT,
             username TEXT,
@@ -89,7 +97,7 @@ class BookStore:
         employees.createTable(
             f"""
             CREATE TABLE {self.EMPLOYEES_TABLE}
-            (id INT PRIMARY KEY,
+            (id INTEGER PRIMARY KEY,
             name TEXT,
             lastname TEXT,
             username TEXT,
@@ -107,7 +115,7 @@ class BookStore:
         inventories.createTable(
             f"""
             CREATE TABLE {self.BOOK_INVENTORY_TABLE}
-            (id INT PRIMARY KEY AUTOINCREMENT,
+            (id INTEGER PRIMARY KEY AUTOINCREMENT,
             book_id INT,
             customer_id INT,
             completed BOOLEAN);
@@ -137,6 +145,9 @@ class BookStore:
         self.employees.clear()
         for emp in employees_table.getData():
             temp = employee.Employee(**emp)
+            if temp.id == 1:
+                self.manager_store = temp
+                temp = manager.Manager(**emp)
             self.employees.append(temp)
         employees_table.close()
 
@@ -156,9 +167,11 @@ class BookStore:
 
     def addBook(self, bk):
         books_table = DatabaseHelper(self.databasePath, self.BOOKS_TABLE)
-        books_table.insert(title=bk.title, author=bk.author, genre=bk.genre, pages=bk.pages, price=bk.price,
-                           count=bk.count)
+        bk_id = books_table.insert(title=bk.title, author=bk.author, genre=bk.genre, pages=bk.pages, price=bk.price,
+                                   count=bk.count)
         books_table.close()
+
+        bk.id = bk_id
         self.books.append(bk)
 
     def removeBook(self, bookId):
@@ -204,7 +217,26 @@ class BookStore:
         customer_table.insert(id=cus.id, name=cus.name, lastname=cus.lastname, username=cus.username,
                               password=cus.password, creationDate=cus.creation_date, credit=cus.credit)
         customer_table.close()
-    
+
+    def __iter__(self):
+        self._current = 0
+        return self
+
+    def __next__(self):
+        if self._current >= len(self.books):
+            raise StopIteration
+
+        temp = self.books[self._current]
+        self._current += 1
+        return temp
+
+    @staticmethod
+    def load_manager(databasePath, tableName):
+        helper = DatabaseHelper(databasePath, tableName)
+        lst = [helper.searchData(id=1)]
+        man = manager.Manager(**lst[0])
+        return man
+
 
 def main():
     pass
