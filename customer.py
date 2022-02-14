@@ -73,6 +73,12 @@ class Customer(person.Person, user.User):
         self.books.append(bk)
 
     def setABookAsCompleted(self, bk):
+        flag = False
+        for i in self.books:
+            if i.id == bk.id:
+                flag = True
+                break
+        if not flag: raise CustomerException(f"Book doesn't exist or you don't own the book!")
         self.completed.append(bk)
 
         # Update database
