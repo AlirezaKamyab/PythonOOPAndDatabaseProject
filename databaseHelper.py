@@ -24,9 +24,9 @@ class DatabaseHelper:
 
     def createTable(self, query : str):
         try:
-            self._db.execute(f"""SELECT * FROM {self.tableName}""")
-        except sqlite3.Error:
             self._db.execute(query)
+        except sqlite3.Error:
+            pass
 
     def dropTable(self):
         self._db.cursor().execute(f"""DROP TABLE IF EXISTS {self.tableName}""")
@@ -38,7 +38,9 @@ class DatabaseHelper:
         placeHolders = '?, ' * len(values)
         placeHolders = placeHolders[:-2]
         query = f"""INSERT INTO {self.tableName} ({keyString}) VALUES ({placeHolders});"""
-        self._db.cursor().execute(query, values)
+        cur = self._db.cursor()
+        cur.execute(query, values)
+        return cur.lastrowid
 
     def update(self, **kwargs):
         id_value = kwargs['id']
@@ -78,6 +80,21 @@ class DatabaseHelper:
         res = cur.execute(f"""SELECT * FROM {self.tableName};""")
         for r in res:
             yield dict(r)
+
+    def searchData(self, **kwargs):
+        placeHolders = ''
+        keys = tuple(kwargs.keys())
+        values = tuple(kwargs.values())
+
+        for i in range(len(keys)):
+            placeHolders += f"""{keys[i]} = '{values[i]}' AND """
+
+        placeHolders = placeHolders[:-5]
+        query = f"""SELECT * FROM {self.tableName} WHERE {placeHolders};"""
+        cur = self._db.cursor()
+        cur.execute(query)
+        for r in cur:
+            yield r
 
     def commit(self):
         self._db.commit()
