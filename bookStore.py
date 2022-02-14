@@ -25,11 +25,11 @@ class BookStore:
         databasePath: locates the database to load data from (optional)
         """
 
-        if 'manager' in kwargs: self.manager_store = kwargs['manager']
-        else: raise BookStoreException('Manager is missing')
-
         if 'databasePath' in kwargs: self.databasePath = kwargs['databasePath']
         else: self.databasePath = 'database.db'
+
+        if 'manager' in kwargs: self.manager_store = kwargs['manager']
+        else: raise BookStoreException('Manager is missing')
 
         self._books = []
         self._employees = []
@@ -56,6 +56,15 @@ class BookStore:
     def manager_store(self, value):
         value.id = 1
         self._manager_store = value
+
+        # Search Database
+        helper = DatabaseHelper(self.databasePath, self.EMPLOYEES_TABLE)
+        lst = list(helper.searchData(id=1))
+        if len(lst) == 0:
+            helper.insert(id=1, name=value.name, lastname=value.lastname, username=value.username,
+                          password=value.password, creationDate=value.creation_date, baseIncome=value.baseIncome,
+                          reward=value.reward, penalty=value.penalty, extraTime=value.extraTime, offHours=value.offHours)
+        helper.close()
 
     def __initialize(self):
         """
@@ -231,9 +240,10 @@ class BookStore:
         return temp
 
     @staticmethod
-    def load_manager(databasePath, tableName):
-        helper = DatabaseHelper(databasePath, tableName)
-        lst = [helper.searchData(id=1)]
+    def load_manager(databasePath):
+        helper = DatabaseHelper(databasePath, BookStore.EMPLOYEES_TABLE)
+        lst = list(helper.searchData(id=1))
+        if len(lst) == 0: return None
         man = manager.Manager(**lst[0])
         return man
 
