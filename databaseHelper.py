@@ -67,7 +67,6 @@ class DatabaseHelper:
         placeHolders = placeHolders[:-5]
 
         query = f"""DELETE FROM {self.tableName} WHERE {placeHolders};"""
-        print(query)
         self._db.cursor().execute(query)
 
     def countRows(self):
