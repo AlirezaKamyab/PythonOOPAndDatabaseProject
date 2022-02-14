@@ -49,6 +49,8 @@ class Customer(person.Person, user.User):
     def buyABook(self, bk):
         if bk.count <= 0: raise CustomerException("Book is out of stock!")
         if bk.price > self.credit: raise CustomerException("Insufficient credit!")
+        for i in self.books:
+            if i.id == bk.id: raise CustomerException("You already own the book")
 
         # Update books table from database
         book_table = DatabaseHelper(self.store.databasePath, self.store.BOOKS_TABLE)
@@ -75,8 +77,9 @@ class Customer(person.Person, user.User):
 
         # Update database
         helper = DatabaseHelper(self.store.databasePath, self.store.BOOK_INVENTORY_TABLE)
-        lst = [helper.searchData(book_id=bk.id, customer_id=self.id)]
-        data = lst[0]
+        lst = list(helper.searchData(book_id=bk.id, customer_id=self.id))
+        if len(lst) == 0: raise CustomerException(f"No such a book found")
+        data = dict(lst[0])
         data['completed'] = True
         helper.update(**data)
         helper.close()
