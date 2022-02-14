@@ -19,7 +19,7 @@ class Manager(employee.Employee):
         offHours: number of hours which employee took hours off
         store: the store which the person or employee is working at
         """
-        employee.Employee.__init__(**kwargs)
+        employee.Employee.__init__(self, **kwargs)
 
     def hireEmployee(self, emp):
         raise NotImplemented

@@ -1,4 +1,9 @@
 #!/usr/bin/env python3
+from databaseHelper import DatabaseHelper
+import book
+import customer
+import employee
+
 
 class BookStoreException(Exception):
     def __init__(self, msg):
@@ -6,7 +11,19 @@ class BookStoreException(Exception):
 
 
 class BookStore:
+    BOOKS_TABLE = 'Books'
+    CUSTOMERS_TABLE = 'Customers'
+    EMPLOYEES_TABLE = 'Employees'
+    BOOK_INVENTORY_TABLE = 'Inventories'
+
     def __init__(self, **kwargs):
+        """
+        Constructs a book store; Table names are optional to specify; it helps to create a better database
+        :param kwargs:
+        manager: This is required to construct a shop
+        databasePath: locates the database to load data from (optional)
+        """
+
         if 'manager' in kwargs: self.manager = kwargs['manager']
         else: raise BookStoreException('Manager is missing')
 
@@ -17,18 +34,142 @@ class BookStore:
         self._employees = []
         self._customers = []
 
+        self.__initialize()
+        self.loadData()
+
     @property
     def books(self): return self._books
     @property
     def customers(self): return self._customers
     @property
     def employees(self): return self._employees
+    @property
+    def databasePath(self): return self._databasePath
 
-    def addBook(self, book):
-        raise NotImplemented
+    @databasePath.setter
+    def databasePath(self, value): self._databasePath = value
+
+    def __initialize(self):
+        """
+        This function tries to create tables which are not yet made inside database.
+        If the table is existed, it does not create another table.
+        :return:
+        Nothing
+        """
+
+        books = DatabaseHelper(self.databasePath, self.BOOKS_TABLE)
+        books.createTable(
+            f"""
+            CREATE TABLE {self.BOOKS_TABLE} 
+            (id INT PRIMARY KEY AUTOINCREMENT,
+            title TEXT,
+            author TEXT,
+            genre TEXT,
+            pages INT,
+            price INT,
+            count INT);
+            """)
+        books.close()
+
+        customers = DatabaseHelper(self.databasePath, self.CUSTOMERS_TABLE)
+        customers.createTable(
+            f"""
+            CREATE TABLE {self.CUSTOMERS_TABLE}
+            (id INT PRIMARY KEY,
+            name TEXT,
+            lastname TEXT,
+            username TEXT,
+            password TEXT,
+            creationDate TEXT,
+            credit INT);
+            """)
+        customers.close()
+
+        employees = DatabaseHelper(self.databasePath, self.CUSTOMERS_TABLE)
+        employees.createTable(
+            f"""
+            CREATE TABLE {self.EMPLOYEES_TABLE}
+            (id INT PRIMARY KEY,
+            name TEXT,
+            lastname TEXT,
+            username TEXT,
+            password TEXT,
+            creationDate TEXT,
+            baseIncome INT,
+            reward INT,
+            penalty INT,
+            extraTime INT,
+            offHours INT);
+            """)
+        employees.close()
+
+        inventories = DatabaseHelper(self.databasePath, self.BOOK_INVENTORY_TABLE)
+        inventories.createTable(
+            f"""
+            CREATE TABLE {self.BOOK_INVENTORY_TABLE}
+            (id INT PRIMARY KEY AUTOINCREMENT,
+            book_id INT,
+            customer_id INT,
+            completed BOOLEAN);
+            """)
+        inventories.close()
+
+    def loadData(self):
+        """
+        Fetches data from database and reloads the lists
+        """
+
+        books_table = DatabaseHelper(self.databasePath, self.BOOKS_TABLE)
+        self.books.clear()
+        for bk in books_table.getData():
+            temp = book.Book(**bk)
+            self.books.append(temp)
+        books_table.close()
+
+        customers_table = DatabaseHelper(self.databasePath, self.CUSTOMERS_TABLE)
+        self.customers.clear()
+        for cus in customers_table.getData():
+            temp = customer.Customer(**cus)
+            self.customers.append(temp)
+        customers_table.close()
+
+        employees_table = DatabaseHelper(self.databasePath, self.EMPLOYEES_TABLE)
+        self.employees.clear()
+        for emp in employees_table.getData():
+            temp = employee.Employee(**emp)
+            self.employees.append(temp)
+        employees_table.close()
+
+        inventory_table = DatabaseHelper(self.databasePath, self.BOOK_INVENTORY_TABLE)
+        for inv in inventory_table.getData():
+            book_id = inv['book_id']
+            customer_id = inv['customer_id']
+            completed = inv['completed']
+
+            cus = self.searchCustomer(customer_id)
+            bk = self.searchBook(book_id)
+            if cus is None: continue
+            if bk is None: continue
+            cus.books.append(bk)
+            if completed: cus.completed.append(bk)
+        inventory_table.close()
+
+    def addBook(self, bk):
+        books_table = DatabaseHelper(self.databasePath, self.BOOKS_TABLE)
+        books_table.insert(title=bk.title, author=bk.author, genre=bk.genre, pages=bk.pages, price=bk.price,
+                           count=bk.count)
+        books_table.close()
+        self.books.append(bk)
 
     def removeBook(self, bookId):
-        raise NotImplemented
+        books_table = DatabaseHelper(self.databasePath, self.BOOKS_TABLE)
+        books_table.delete(id=bookId)
+        books_table.close()
+
+        for i in range(len(self.books)):
+            if self.books[i].id == bookId:
+                self.books.pop(i)
+                break
 
     def searchEmployee(self, employeeId):
         for emp in self.employees:
@@ -41,8 +182,8 @@ class BookStore:
         return None
 
     def searchBook(self, bookId):
-        for book in self.books:
-            if book.id == bookId: return book
+        for bk in self.books:
+            if bk.id == bookId: return bk
         return None
 
     def logAsEmployee(self, username : str, password : str):
@@ -58,8 +199,11 @@ class BookStore:
     def registerACustomer(self, cus):
         if self.searchCustomer(cus.id) is not None: raise BookStoreException("Id should be a unique value!")
         self.customers.append(cus)
-        # update database
-        raise NotImplemented
+
+        customer_table = DatabaseHelper(self.databasePath, self.CUSTOMERS_TABLE)
+        customer_table.insert(id=cus.id, name=cus.name, lastname=cus.lastname, username=cus.username,
+                              password=cus.password, creationDate=cus.creation_date, credit=cus.credit)
+        customer_table.close()
     
 
 def main():
