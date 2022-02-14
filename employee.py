@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import person
 import user
+from databaseHelper import DatabaseHelper
 
 
 class EmployeeException(Exception):
@@ -101,17 +102,32 @@ class Employee(person.Person, user.User):
         if self.offHours >= self.MAX_OFF_HOURS:
             self.penalty = (self.offHours - self.MAX_OFF_HOURS) * self.PENALTY
 
+        self.update_employee_from_database()
+
     def extraWork(self, hours):
         if self.extraTime + hours > self.MAX_EXTRA_HOURS: raise EmployeeException("Working extra time's limit exceed")
 
         self.extraTime += hours
         self.reward = self.extraTime * self.REWARD
 
+        self.update_employee_from_database()
+
     def income(self):
         return self.baseIncome + self.reward - self.penalty
 
     def CustomerInfo(self, customerId):
-        raise NotImplemented
+        cus = self.store.searchCustomer(customerId)
+        if cus is None: return f'Customer with id {customerId}'
+
+        return f'#{cus.id} {cus.name} {cus.lastname}\nUsername: {cus.username} Password: {cus.password}\n' \
+               f'Credit: {cus.credit}'
+
+    def update_employee_from_database(self):
+        helper = DatabaseHelper(self.store.databasePath, self.store.EMPLOYEES_TABLE)
+        helper.update(id=self.id, name=self.name, lastname=self.lastname, username=self.username,
+                      password=self.password, extraTime=self.extraTime, offHours=self.offHours, reward=self.reward,
+                      penalty=self.penalty, baseIncome=self.baseIncome)
+        helper.close()
 
 
 def main():
