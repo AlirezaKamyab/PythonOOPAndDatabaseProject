@@ -69,9 +69,7 @@ class Manager(employee.Employee):
         emp = self.store.searchEmployee(employeeId)
         if emp is None: return f'No employee found with id = {employeeId}'
 
-        return f"#{emp.id} {emp.name} {emp.lastname}\n" \
-               f"Username: {emp.username} Password: {emp.password}\n" \
-               f"Income: {emp.income()} "
+        return f"{emp}"
 
 
 
