@@ -15,7 +15,7 @@ def main():
     store = bookStore.BookStore(manager=man)
 
     while True:
-        os.system('cls')
+        clearConsole()
         print("        Main Menu")
         print("---------------------------")
         print("1- Log as Employee")
@@ -25,7 +25,7 @@ def main():
         inp = input(">> ")
 
         if inp == '1':
-            os.system('cls')
+            clearConsole()
             username = input('Username >> ')
             password = input('Password >> ')
             emp = store.logAsEmployee(username, password)
@@ -34,7 +34,7 @@ def main():
                 os.system('pause')
             else: employee_menu(emp, store)
         elif inp == '2':
-            os.system('cls')
+            clearConsole()
             username = input("Username >> ")
             password = input ("Password >> ")
             cus = store.logAsCustomer(username, password)
@@ -53,7 +53,7 @@ def main():
 
 
 def registration_form(store):
-    os.system('cls')
+    clearConsole()
     try:
         id_number = int(input("ID >> "))
         name = input("Name >> ")
@@ -75,7 +75,7 @@ def registration_form(store):
 def customer_menu(cus, store):
     while True:
         cus.store = store
-        os.system('cls')
+        clearConsole()
         print(f"{cus.username} ({cus.name} {cus.lastname}) (Credit: {cus.credit})")
         print(f"_________________________")
         print("1- My books")
@@ -86,7 +86,7 @@ def customer_menu(cus, store):
         inp = input(">> ")
 
         if inp == '1':
-            os.system('cls')
+            clearConsole()
             print("      My Books")
             print("-----------------------")
             for bk in cus.books:
@@ -94,7 +94,7 @@ def customer_menu(cus, store):
             print()
             os.system('pause')
         elif inp == '2':
-            os.system('cls')
+            clearConsole()
             try:
                 print("      Completed Books")
                 print("---------------------------")
@@ -111,7 +111,7 @@ def customer_menu(cus, store):
                 print(ex)
             os.system('pause')
         elif inp == '3':
-            os.system('cls')
+            clearConsole()
             try:
                 amount = int(input("Amount >> "))
                 cus.increaseCredit(amount)
@@ -121,7 +121,7 @@ def customer_menu(cus, store):
             print()
             os.system('pause')
         elif inp == '4':
-            os.system('cls')
+            clearConsole()
             try:
                 print("     Available Books")
                 print("----------------------------")
@@ -138,7 +138,7 @@ def customer_menu(cus, store):
             print()
             os.system('pause')
         elif inp == '5':
-            os.system('cls')
+            clearConsole()
             try:
                 print("          Books")
                 print("----------------------------")
@@ -155,7 +155,7 @@ def customer_menu(cus, store):
 
 
 def create_employee():
-    os.system('cls')
+    clearConsole()
     try:
         id_number = int(input("ID >> "))
         name = input("Name >> ")
@@ -174,7 +174,7 @@ def create_employee():
 
 
 def create_book():
-    os.system('cls')
+    clearConsole()
     try:
         title = input("Title >> ")
         author = input("Author >> ")
@@ -194,7 +194,7 @@ def employee_menu(emp, store):
     isManager = isinstance(emp, manager.Manager)
 
     while True:
-        os.system('cls')
+        clearConsole()
         print(f"{emp.username}")
         print("------------------------")
         print("1- Leave")
@@ -213,7 +213,7 @@ def employee_menu(emp, store):
         inp = input(">> ")
 
         if inp == '1':
-            os.system('cls')
+            clearConsole()
             try:
                 hours = int(input("Hours >> "))
                 emp.leave(hours)
@@ -222,7 +222,7 @@ def employee_menu(emp, store):
                 print(ex)
             os.system('pause')
         elif inp == '2':
-            os.system('cls')
+            clearConsole()
             try:
                 hours = int(input("Hours >> "))
                 emp.extraWork(hours)
@@ -231,7 +231,7 @@ def employee_menu(emp, store):
                 print(ex)
             os.system('pause')
         elif inp == '3':
-            os.system('cls')
+            clearConsole()
             try:
                 cus_id = int(input("Customer ID >> "))
                 print(emp.customerInfo(cus_id))
@@ -239,13 +239,13 @@ def employee_menu(emp, store):
                 print(ex)
             os.system('pause')
         elif inp == '4':
-            os.system('cls')
+            clearConsole()
             print("     Personal Info")
             print("--------------------------")
             print(emp)
             os.system('pause')
         elif inp == '5':
-            os.system('cls')
+            clearConsole()
             try:
                 print("          Books")
                 print("----------------------------")
@@ -255,7 +255,7 @@ def employee_menu(emp, store):
                 print(ex)
             os.system('pause')
         elif inp == '6' and isManager:
-            os.system('cls')
+            clearConsole()
             try:
                 cm = create_employee()
                 emp.hireEmployee(cm)
@@ -264,7 +264,7 @@ def employee_menu(emp, store):
                 print(ex)
             os.system('pause')
         elif inp == '7' and isManager:
-            os.system('cls')
+            clearConsole()
             try:
                 id_number = int(input("Employee ID >> "))
                 emp.fireEmployee(id_number)
@@ -272,7 +272,7 @@ def employee_menu(emp, store):
                 print(ex)
             os.system('pause')
         elif inp == '8' and isManager:
-            os.system('cls')
+            clearConsole()
             try:
                 bk = create_book()
                 emp.addBook(bk)
@@ -281,7 +281,7 @@ def employee_menu(emp, store):
                 print(ex)
             os.system('pause')
         elif inp == '9' and isManager:
-            os.system('cls')
+            clearConsole()
             try:
                 id_number = int(input("Book ID >> "))
                 emp.removeABook(id_number)
@@ -290,7 +290,7 @@ def employee_menu(emp, store):
                 print(ex)
             os.system('pause')
         elif inp == '10' and isManager:
-            os.system('cls')
+            clearConsole()
             try:
                 id_number = int(input("Employee ID >> "))
                 print(emp.employeeInformation(id_number))
@@ -302,6 +302,11 @@ def employee_menu(emp, store):
         else:
             print("Invalid Input!")
             os.system('pause')
+
+
+def clearConsole():
+    if os.system('cls') == 0: return
+    os.system('clear')
 
 
 if __name__ == "__main__": main()
