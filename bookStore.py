@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+import sqlite3
+
 import manager
 from databaseHelper import DatabaseHelper
 import book
@@ -28,6 +30,8 @@ class BookStore:
         if 'databasePath' in kwargs: self.databasePath = kwargs['databasePath']
         else: self.databasePath = 'database.db'
 
+        self.__initialize()
+
         if 'manager' in kwargs: self.manager_store = kwargs['manager']
         else: raise BookStoreException('Manager is missing')
 
@@ -35,7 +39,6 @@ class BookStore:
         self._employees = []
         self._customers = []
 
-        self.__initialize()
         self.loadData()
 
     @property
@@ -242,10 +245,13 @@ class BookStore:
     @staticmethod
     def load_manager(databasePath):
         helper = DatabaseHelper(databasePath, BookStore.EMPLOYEES_TABLE)
-        lst = list(helper.searchData(id=1))
-        if len(lst) == 0: return None
-        man = manager.Manager(**lst[0])
-        return man
+        try:
+            lst = list(helper.searchData(id=1))
+            if len(lst) == 0: return None
+            man = manager.Manager(**lst[0])
+            return man
+        except sqlite3.Error:
+            return None
 
 
 def main():
